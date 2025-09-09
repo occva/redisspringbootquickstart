@@ -7,9 +7,15 @@ import io.swagger.v3.oas.models.info.License;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Knife4j API文档配置
+ */
 @Configuration
 public class OpenApiConfig {
     
+    /**
+     * 配置Knife4j的OpenAPI信息
+     */
     @Bean
     public OpenAPI openAPI() {
         return new OpenAPI()

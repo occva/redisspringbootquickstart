@@ -7,7 +7,7 @@ spring:
       host: localhost
       port: 6379
       database: 0
-      password: 123456
+      password:
       timeout: 5s
       connect-timeout: 5s
       lettuce:
@@ -17,12 +17,12 @@ spring:
           max-active: 8
           max-wait: -1ms
 
-# Swagger 配置
-springdoc:
-  swagger-ui:
-    path: /swagger-ui.html
-    tags-sorter: alpha
-    operations-sorter: alpha
-  api-docs:
-    path: /v3/api-docs
-  packages-to-scan: com.test.redis.redis.controller
+# Knife4j 配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    swagger-model-name: 实体类列表
+  production: false
+  basic:
+    enable: false

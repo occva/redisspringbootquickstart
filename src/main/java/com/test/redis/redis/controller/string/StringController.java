@@ -4,9 +4,9 @@ import com.test.redis.redis.common.Result;
 import com.test.redis.redis.service.RedisService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -14,46 +14,46 @@ import java.util.concurrent.TimeUnit;
 @Tag(name = "String 类型", description = "字符串类型操作接口")
 public class StringController {
 
-    private final RedisService redisService;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public StringController(RedisService redisService) {
-        this.redisService = redisService;
+        this.redisTemplate = redisService.getRedisTemplate();
     }
 
-    @Operation(summary = "设置字符串")
-    @PostMapping
-    public Result<Map<String, Object>> setString(@RequestParam String key, @RequestParam String value) {
-        redisService.setString(key, value);
-        Map<String, Object> data = Map.of(
-            "key", (Object)key,
-            "value", (Object)value
-        );
-        return Result.success(data);
+    @Operation(summary = "String - 增：设置字符串")
+    @PostMapping("/add")
+    public Result<String> stringAdd(@RequestParam String key, @RequestParam String value) {
+        redisTemplate.opsForValue().set(key, value);
+        return Result.success("设置成功");
     }
 
-    @Operation(summary = "获取字符串")
-    @GetMapping
-    public Result<Map<String, Object>> getString(@RequestParam String key) {
-        String value = redisService.getString(key);
-        Map<String, Object> data = Map.of(
-            "key", (Object)key,
-            "value", (Object)value
-        );
-        return Result.success(data);
-    }
-
-    @Operation(summary = "设置带过期时间的字符串")
-    @PostMapping("/expire")
-    public Result<Map<String, Object>> setStringWithExpiration(@RequestParam String key, @RequestParam String value, 
+    @Operation(summary = "String - 增：设置带过期时间的字符串")
+    @PostMapping("/add/expire")
+    public Result<String> stringAddWithExpiration(@RequestParam String key, @RequestParam String value, 
             @RequestParam long timeout, @RequestParam String unit) {
         TimeUnit timeUnit = TimeUnit.valueOf(unit.toUpperCase());
-        redisService.setStringWithExpiration(key, value, timeout, timeUnit);
-        Map<String, Object> data = Map.of(
-            "key", (Object)key,
-            "value", (Object)value,
-            "timeout", (Object)timeout,
-            "unit", (Object)unit
-        );
-        return Result.success(data);
+        redisTemplate.opsForValue().set(key, value, timeout, timeUnit);
+        return Result.success("设置成功，过期时间: " + timeout + " " + unit);
+    }
+
+    @Operation(summary = "String - 删：删除字符串")
+    @DeleteMapping("/delete")
+    public Result<Boolean> stringDelete(@RequestParam String key) {
+        Boolean deleted = redisTemplate.delete(key);
+        return Result.success(deleted);
+    }
+
+    @Operation(summary = "String - 改：更新字符串")
+    @PutMapping("/update")
+    public Result<String> stringUpdate(@RequestParam String key, @RequestParam String newValue) {
+        redisTemplate.opsForValue().set(key, newValue);
+        return Result.success("更新成功");
+    }
+
+    @Operation(summary = "String - 查：获取字符串")
+    @GetMapping("/query")
+    public Result<Object> stringQuery(@RequestParam String key) {
+        Object value = redisTemplate.opsForValue().get(key);
+        return Result.success(value);
     }
 } 
